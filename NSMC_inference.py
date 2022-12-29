@@ -14,10 +14,13 @@ np.random.seed(random_seed)
 torch.manual_seed(random_seed)
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
+ckpt_name = "model_save/BERT_fintuing_NSMC-1.pt"
 model = AutoModelForSequenceClassification.from_pretrained(
     'lighthouse/mdeberta-v3-base-kor-further',
     num_labels=2,
-).cuda()
+)
+model.load_state_dict(torch.load(ckpt_name, map_location="cpu"))
+model.cuda()
 
 tokenizer = AutoTokenizer.from_pretrained("lighthouse/mdeberta-v3-base-kor-further")  # DebertaV2Tokenizer (SentencePiece)
 
