@@ -6,12 +6,14 @@ from torch.optim import AdamW
 import torch
 import numpy as np
 import random
+import os
 # model = AutoModelForSequenceClassification.from_pretrained("mdeberta-v3-base-kor-further")  # DebertaV2ForModel
 
 random_seed = 1234
 random.seed(random_seed)
 np.random.seed(random_seed)
 torch.manual_seed(random_seed)
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 model = AutoModelForSequenceClassification.from_pretrained(
     'lighthouse/mdeberta-v3-base-kor-further',
@@ -66,7 +68,7 @@ optimizer = AdamW(params=model.parameters(),
     lr=3e-5, weight_decay=3e-7
 )
 
-epochs = 1
+epochs = 10
 for epoch in range(epochs):
     model.train()
     for train in tqdm(train_loader):

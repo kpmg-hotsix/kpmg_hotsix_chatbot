@@ -5,12 +5,14 @@ from torch.utils.data import DataLoader
 import torch
 import numpy as np
 import random
+import os
 # model = AutoModelForSequenceClassification.from_pretrained("mdeberta-v3-base-kor-further")  # DebertaV2ForModel
 
 random_seed = 1234
 random.seed(random_seed)
 np.random.seed(random_seed)
 torch.manual_seed(random_seed)
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 model = AutoModelForSequenceClassification.from_pretrained(
     'lighthouse/mdeberta-v3-base-kor-further',
