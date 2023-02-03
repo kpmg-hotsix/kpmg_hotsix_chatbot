@@ -25,13 +25,13 @@ from deepspeed.comm import comm
 os.environ["TOKENIZERS_PARALLELISM"] = "True"
 
 parser = ArgumentParser()
-parser.add_argument("--config", "-c", type=str, required=True)
-config = json.load(open(parser.parse_args().config))
 parser.add_argument("--model_name", type=str, default="lighthouse/mdeberta-v3-base-kor-further")
 parser.add_argument("--epoch", default=50, type=int)
 parser.add_argument("--batch_size", default=16, type=int)
 parser.add_argument("--randomseed", default=32, type=int)
 parser.add_argument("--max_length", default=120, type=int)
+parser.add_argument("--config", "-c", type=str, required=True)
+config = json.load(open(parser.parse_args().config))
 args = parser.parse_args()
 
 seed_everything(args.randomseed)
