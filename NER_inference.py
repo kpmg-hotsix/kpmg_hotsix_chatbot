@@ -15,7 +15,9 @@ KLUE_NER_OUTPUT = "output.csv"  # the name of the output file should be output.c
 
 parser = ArgumentParser()
 parser.add_argument("--config", "-c", type=str, required=True)
+parser.add_argument("--model_name", type=str, default="lighthouse/mdeberta-v3-base-kor-further")
 config = json.load(open(parser.parse_args().config))
+args = parser.parse_args()
 
 @torch.no_grad()
 def inference():
@@ -23,11 +25,11 @@ def inference():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Load tokenzier
-    tokenizer = AutoTokenizer.from_pretrained(config["model_name"])
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
     label_list = config["inference"]["label_list"]
 
     # Load model
-    model = AutoModelForTokenClassification.from_pretrained(config["model_name"], num_labels=len(label_list))
+    model = AutoModelForTokenClassification.from_pretrained(args.model_name, num_labels=len(label_list))
     model.load_state_dict(torch.load(config["inference"]["checkpoint"], map_location="cpu"))
     model.to(device)
     model.config.id2label = {i: label for i, label in zip(range(len(label_list)), label_list)}
