@@ -1,0 +1,45 @@
+{
+    "model_name": "klue/roberta-large",
+    "datasets": {
+        "dset_name": "klue",
+        "task": "ner",
+        "num_labels": 7
+    },
+    "experiment": {
+        "seed": 42,
+        "train_batch_size": 32,
+        "valid_batch_size": 32,
+        "num_epochs": 20,
+        "max_token_length": 120,
+        "learning_rate": 0.00003,
+        "weight_decay": 0.001,
+        "warmup_ratio": 0.05,
+        "adam_beta_1": 0.9,
+        "adam_beta_2": 0.999,
+        "epsilon": 0.00000001,
+        "fp16": false,
+        "load_best_model_at_end": true,
+        "gradient_accumulation_steps": 1,
+        "num_checkpoints": 5,
+        "evaluation_strategy": "steps",
+        "save_strategy": "steps",
+        "metric_for_best_model": "f1",
+        "logging_steps": 100,
+        "eval_steps": 500,
+        "save_steps": 500,
+        "dropout": 0.1,
+        "inference_model_name": "path"
+    },
+    "inference":{
+        "checkpoint": "klue_roberta-large-finetuned-ner/checkpoint-6500/pytorch_model.bin",
+        "label_list" :[
+            "PS",
+            "LC",
+            "OG",
+            "DT",
+            "TI",
+            "QT",
+            "O"
+        ]
+    }
+}
