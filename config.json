@@ -1,10 +1,5 @@
 {
-    "model_name": "klue/roberta-large",
-    "datasets": {
-        "dset_name": "klue",
-        "task": "ner",
-        "num_labels": 7
-    },
+    "model_name": "lighthouse/mdeberta-v3-base-kor-further",
     "experiment": {
         "seed": 42,
         "train_batch_size": 32,
@@ -31,15 +26,10 @@
         "inference_model_name": "path"
     },
     "inference":{
-        "checkpoint": "klue_roberta-large-finetuned-ner/checkpoint-6500/pytorch_model.bin",
+        "checkpoint": "lighthouse/mdeberta-v3-base-kor-further_NER/checkpoint-500/pytorch_model.bin",
         "label_list" :[
-            "PS",
-            "LC",
-            "OG",
-            "DT",
-            "TI",
-            "QT",
-            "O"
+            "O",
+            "TR_SCIENCE"
         ]
     }
 }
