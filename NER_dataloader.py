@@ -46,20 +46,20 @@ eval_data = all_df[int(len(all_df)*0.8):]
 train_data.to_csv('data/train_data.csv', sep='\t')
 eval_data.to_csv('data/eval_data.csv', sep='\t')
 
-tokenizer = AutoTokenizer.from_pretrained('lighthouse/mdeberta-v3-base-kor-further')
-
 train_ds = Dataset.from_pandas(train_data, split="train")
 eval_ds = Dataset.from_pandas(eval_data, split="eval")
 
 class Loader :
 
-    def __init__(self, max_length) :
+    def __init__(self, max_length, tokenizer_name) :
         self.max_length = max_length
+        self.tokenizer_name = tokenizer_name
+
 
     def train_load(self) :
         global train_ds
         
-        tokenizer = AutoTokenizer.from_pretrained('lighthouse/mdeberta-v3-base-kor-further')
+        tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
         encode_fn = partial(self.label_tokens_ner, tokenizer=tokenizer)
 
         train_ds = train_ds.map(encode_fn, batched=False)
@@ -70,7 +70,7 @@ class Loader :
     def eval_load(self) :
         global eval_ds
 
-        tokenizer = AutoTokenizer.from_pretrained('lighthouse/mdeberta-v3-base-kor-further')
+        tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_name)
         encode_fn = partial(self.label_tokens_ner, tokenizer=tokenizer)
 
         eval_ds = eval_ds.map(encode_fn, batched=False)

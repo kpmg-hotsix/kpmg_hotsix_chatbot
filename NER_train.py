@@ -43,7 +43,7 @@ model = AutoModelForTokenClassification.from_pretrained(
 
 tokenizer = AutoTokenizer.from_pretrained(args.model_name)
 
-loader = Loader(args.max_length)
+loader = Loader(args.max_length, args.model_name)
 train_datasets = loader.train_load()
 eval_datasets = loader.eval_load()
 
