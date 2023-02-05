@@ -54,7 +54,7 @@ eval_datasets = eval_datasets.map(preprocessor, batched=True)
 data_collator = DataCollatorForTokenClassification(tokenizer)
 
 wandb.init(project="KPMG", name=f"{args.model_name}_NER")
-run_name = f"{args.model_name}_NER"
+run_name = f"{args.model_name.replace('/', '-')}_NER"
 
 training_args = TrainingArguments(
     run_name,
