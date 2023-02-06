@@ -24,6 +24,11 @@ class Metric :
         self.label_list = [
             "O",
             "TR_SCIENCE",
+            "TR_SOCIAL_SCIENCE",
+            "TR_MEDICINE",
+            "TR_ART",
+            "TR_HUMANITIES",
+            "TR_OTHERS"
         ]
 
     def compute_metrics(self, p):
