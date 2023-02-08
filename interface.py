@@ -1,5 +1,6 @@
 import re
 from data.news_search import news_search
+from Sentiment_Analysis.korfin_inference import Sentiment_Analysis
 
 while True:
     t = input("\nchat: ")
@@ -23,7 +24,10 @@ while True:
         company = t.split("최근 이슈")[0].replace('의', '')
         print(company) 
         print('task3') 
-        print(news_search(company))
+        news_title = news_search(company)
+        print(news_title)
+        for t in news_title:
+            Sentiment_Analysis(t)
         
     if "재무재표" in t:
         company = t.split("재무재표")[0].replace('의', '')
