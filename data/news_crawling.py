@@ -22,20 +22,11 @@ def makePgNum(num):
 
 # 크롤링 url 생성 (검색어, 시작, 종료)
 # &sort= 0 관련순 1 최신순 2 오래된순
-def makeUrl(search, start_pg, end_pg):
-    if start_pg == end_pg:
-        start_page = makePgNum(start_pg)
-        url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(start_page)
-        print("생성url: ", url)
-        return [url]
-    else:
-        urls = []
-        for i in range(start_pg, end_pg + 1):
-            page = makePgNum(i)
-            url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(page)
-            urls.append(url)
-        print("생성url: ", urls)
-        return urls    
+def makeUrl(search, pg, op=0):
+    start_page = makePgNum(pg)
+    url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(start_page) + "&sort=" + str(op)
+    print("생성url: ", url)
+    return url
 
 def news_attrs_crawler(articles,attrs):
     attrs_content=[]
@@ -55,24 +46,16 @@ def articles_crawler(url):
 
 
 # naver url 생성
-def getNaverURL(name, pg):
-    news_url =[]
+def getNaverURL(name, pg, op=0):
 
-    url = makeUrl(name,pg,pg)
+    url = makeUrl(name,pg, op)
+    news_url = articles_crawler(url)
 
-    for i in url:
-        url = articles_crawler(i)
-        news_url.append(url)
-
-    # 1차원 리스트로
-    news_url_1 = []
-    news_url_1 = sum(news_url, [])
-
-    # NAVER 뉴스만 남기기
+    # only Naver news
     final_urls = []
-    for i in tqdm(range(len(news_url_1))):
-        if "news.naver.com" in news_url_1[i]:
-            final_urls.append(news_url_1[i])
+    for i in tqdm(range(len(news_url))):
+        if "news.naver.com" in news_url[i]:
+            final_urls.append(news_url[i])
         else:
             pass
     return final_urls
@@ -158,6 +141,8 @@ for name in tqdm(names):
         news_dates += news_dates2
         if len(news_urls) >= 5:
             break
+
+    # getting 5 articles
     print('news_title: ',len(news_titles))
     print('news_url: ',len(news_urls))
     print('news_contents: ',len(news_contents))
