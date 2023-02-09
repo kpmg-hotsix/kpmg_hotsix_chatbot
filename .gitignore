@@ -130,6 +130,7 @@ dmypy.json
 
 # data
 data/*.csv
-exps
 wandb
-data_exps
+
+# pycharm
+.idea/

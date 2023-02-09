@@ -44,7 +44,6 @@ def articles_crawler(url):
     url = news_attrs_crawler(url_naver,'href')
     return url
 
-
 # naver url 생성
 def getNaverURL(name, pg, op=0):
 
@@ -60,46 +59,29 @@ def getNaverURL(name, pg, op=0):
             pass
     return final_urls
 
-# 뉴스 내용 크롤링
-def getNewsContents(name, urls):
+def getNewsTitle(urls, search):
     
-    news_titles = []
-    news_contents =[]
-    news_dates = []
     news_urls = []
+    news_titles = []
+    news_dates = []
 
     for i in urls:
-        # 기사 html get
         news = requests.get(i,headers=headers)
         news_html = BeautifulSoup(news.text,"html.parser")
 
-        # 뉴스 제목 
         title = news_html.select_one("#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
-        
         if title == None:
             title = news_html.select_one("#content > div.end_ct > div > h2")
-            if title == None :
-                continue
         
-        content = news_html.select("div#dic_area")
-        if content == []: # content 추출 안 됐을 때
-            content = news_html.select("#articeBody")
-
-        print(i, len(content))
-        content = ''.join(str(content))
+        # # 제목에 기업명이 있는 경우만 추출
+        # if search not in title:
+        #     continue
 
         pattern1 = '<[^>]*>'
         title = re.sub(pattern=pattern1, repl='', string=str(title))
-        if name not in title:
-            continue
 
-        content = re.sub(pattern=pattern1, repl='', string=content)
-        pattern2 = """[\n\n\n\n\n// flash 오류를 우회하기 위한 함수 추가\nfunction _flash_removeCallback() {}"""
-        content = content.replace(pattern2, '')
-        
         news_urls.append(i)
         news_titles.append(title)
-        news_contents.append(content)
 
         try:
             html_date = news_html.select_one("div#ct> div.media_end_head.go_trans > div.media_end_head_info.nv_notrans > div.media_end_head_info_datestamp > div > span") # 수정
@@ -108,57 +90,42 @@ def getNewsContents(name, urls):
         except AttributeError:
             news_date = news_html.select_one("#content > div.end_ct > div > div.article_info > span > em")
             news_date = re.sub(pattern=pattern1,repl='',string=str(news_date))
-        # 날짜 가져오기
+
         news_dates.append(news_date)
-    return news_urls, news_titles, news_contents, news_dates
+    return news_urls, news_titles, news_dates
 
 
+def recent_check(dates):
+    for date in dates:
+        day = date.split()[0]
+        now = datetime.now()
+        date_to_compare = datetime.strptime(day, "%Y-%m-%d")
+        date_diff = now - date_to_compare
 
-final_news_titles = []
-final_news_urls = []
-final_news_contents = []
-final_news_dates = []
-final_news_searches = []
+        # 1 년 이상 차이 날 경우 false
+        if date_diff.days > 365:
+            return False
+    return True
 
-# set names
-raw_data = pd.read_csv('kpmg - DB.csv', encoding='cp949')
-print(raw_data.head())
-names = raw_data['기업명'].to_list()
-names = ["\""+i+"\"" for i in names] # for correct search
-# names = ['\"노타\"']
 
-for name in tqdm(names):
+def news_search(name):
+    
+    ## set names
+    name = "\""+ name +"\"" # for correct search
     news_urls = []
     news_titles = []
     news_dates = []
-    news_contents = []
+
     for i in range(10):
-        urls = getNaverURL(name, i+1)
-        news_urls2, news_titles2, news_contents2, news_dates2 = getNewsContents(urls, name)
+        urls = getNaverURL(name, i+1, 1)
+        news_urls2, news_titles2, news_dates2 = getNewsTitle(urls, name)
         news_urls += news_urls2
         news_titles += news_titles2
-        news_contents += news_contents2
         news_dates += news_dates2
+        if not recent_check(news_dates2):
+            break
         if len(news_urls) >= 5:
             break
 
-    # getting 5 articles
-    print('news_title: ',len(news_titles))
-    print('news_url: ',len(news_urls))
-    print('news_contents: ',len(news_contents))
-    print('news_dates: ',len(news_dates))
-    final_news_searches += [name[1:-1]]*len(news_titles[:5])
-    final_news_titles += news_titles[:5]
-    final_news_urls += news_urls[:5]
-    final_news_contents += news_contents[:5]
-    final_news_dates += news_dates[:5]
+    return news_titles[:5]
 
-print(len(final_news_searches), len(final_news_titles), len(final_news_contents), len(final_news_urls), len(final_news_dates))
-
-### dataframe save
-news_df = pd.DataFrame({'search': final_news_searches,'date':final_news_dates,'title':final_news_titles,'link':final_news_urls,'content':final_news_contents})
-news_df = news_df.drop_duplicates(keep='first',ignore_index=True)
-print("중복 제거 후 행 개수: ",len(news_df))
-
-now = datetime.datetime.now() 
-news_df.to_csv('{}.csv'.format(now.strftime('%Y%m%d_%Hh%Mm%Ss')),encoding='utf-8-sig',index=False)
