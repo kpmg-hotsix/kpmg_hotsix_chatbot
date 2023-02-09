@@ -21,12 +21,12 @@ def makePgNum(num):
 
 
 # 크롤링 url 생성 (검색어, 시작, 종료)
-# &sort=0 관련순 1 최신순 2 오래된순
+# &sort= 0 관련순 1 최신순 2 오래된순
 def makeUrl(search, start_pg, end_pg):
     if start_pg == end_pg:
         start_page = makePgNum(start_pg)
         url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(start_page) + "&sort=1"
-        print("생성url: ", url)
+        # print("생성url: ", url)
         return [url]
     else:
         urls = []
@@ -34,7 +34,7 @@ def makeUrl(search, start_pg, end_pg):
             page = makePgNum(i)
             url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(page) + "&sort=1"
             urls.append(url)
-        print("생성url: ", urls)
+        # print("생성url: ", urls)
         return urls    
 
 def news_attrs_crawler(articles,attrs):
@@ -132,5 +132,3 @@ def news_search(name):
 
     # return news_titles[:5], news_dates[:5]    
     return news_titles[:5]
-
-news_search('노타')
