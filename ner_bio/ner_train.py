@@ -36,7 +36,7 @@ def train(config, training_config):
     model = AutoModelForTokenClassification.from_pretrained(config.model_name, num_labels=len(dataloader.label_to_id))
     tokenizer = AutoTokenizer.from_pretrained(config.model_name)
 
-    train_datasets, eval_datasets = dataloader.load_data()
+    datasets = dataloader.load_data()
     data_collator = DataCollatorForTokenClassification(tokenizer)
     metric = Seqeval(list(dataloader.label_to_id.keys()))
 
@@ -52,8 +52,8 @@ def train(config, training_config):
     trainer = Trainer(
         model,
         training_args,
-        train_dataset=train_datasets,
-        eval_dataset=eval_datasets,
+        train_dataset=datasets["train"],
+        eval_dataset=datasets["test"],
         data_collator=data_collator,
         tokenizer=tokenizer,
         compute_metrics=metric.compute_seqeval
