@@ -21,7 +21,7 @@ def makePgNum(num):
 
 
 # 크롤링 url 생성 (검색어, 시작, 종료)
-# &sort=0 관련순 1 최신순 2 오래된순
+# &sort= 0 관련순 1 최신순 2 오래된순
 def makeUrl(search, start_pg, end_pg):
     if start_pg == end_pg:
         start_page = makePgNum(start_pg)
@@ -55,10 +55,10 @@ def articles_crawler(url):
 
 
 # naver url 생성
-def getNaverURL(name):
+def getNaverURL(name, pg):
     news_url =[]
 
-    url = makeUrl(name,1,1)
+    url = makeUrl(name,pg,pg)
 
     for i in url:
         url = articles_crawler(i)
@@ -75,14 +75,15 @@ def getNaverURL(name):
             final_urls.append(news_url_1[i])
         else:
             pass
-    return final_urls[:5]
+    return final_urls
 
 # 뉴스 내용 크롤링
-def getNewsContents(urls):
+def getNewsContents(name, urls):
     
     news_titles = []
     news_contents =[]
     news_dates = []
+    news_urls = []
 
     for i in urls:
         # 기사 html get
@@ -91,25 +92,29 @@ def getNewsContents(urls):
 
         # 뉴스 제목 
         title = news_html.select_one("#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
+        
         if title == None:
             title = news_html.select_one("#content > div.end_ct > div > h2")
+            if title == None :
+                continue
         
-        # 뉴스 본문 
         content = news_html.select("div#dic_area")
         if content == []: # content 추출 안 됐을 때
             content = news_html.select("#articeBody")
 
-        # 기사 텍스트 list 합치기
         print(i, len(content))
         content = ''.join(str(content))
 
-        # html 태그제거 및 텍스트 다듬기
         pattern1 = '<[^>]*>'
         title = re.sub(pattern=pattern1, repl='', string=str(title))
+        if name not in title:
+            continue
+
         content = re.sub(pattern=pattern1, repl='', string=content)
         pattern2 = """[\n\n\n\n\n// flash 오류를 우회하기 위한 함수 추가\nfunction _flash_removeCallback() {}"""
         content = content.replace(pattern2, '')
-
+        
+        news_urls.append(i)
         news_titles.append(title)
         news_contents.append(content)
 
@@ -122,7 +127,7 @@ def getNewsContents(urls):
             news_date = re.sub(pattern=pattern1,repl='',string=str(news_date))
         # 날짜 가져오기
         news_dates.append(news_date)
-    return news_titles, news_contents, news_dates
+    return news_urls, news_titles, news_contents, news_dates
 
 
 
@@ -132,26 +137,38 @@ final_news_contents = []
 final_news_dates = []
 final_news_searches = []
 
-## set names
-raw_data = pd.read_csv('kpmg 기업 db - 5.csv')
+# set names
+raw_data = pd.read_csv('kpmg - DB.csv', encoding='cp949')
 print(raw_data.head())
-names = raw_data['회사명'].to_list()
+names = raw_data['기업명'].to_list()
+names = ["\""+i+"\"" for i in names] # for correct search
+# names = ['\"노타\"']
 
 for name in tqdm(names):
-    news_urls = getNaverURL(name)
-    news_titles, news_contents, news_dates = getNewsContents(news_urls)
+    news_urls = []
+    news_titles = []
+    news_dates = []
+    news_contents = []
+    for i in range(10):
+        urls = getNaverURL(name, i+1)
+        news_urls2, news_titles2, news_contents2, news_dates2 = getNewsContents(urls, name)
+        news_urls += news_urls2
+        news_titles += news_titles2
+        news_contents += news_contents2
+        news_dates += news_dates2
+        if len(news_urls) >= 5:
+            break
     print('news_title: ',len(news_titles))
     print('news_url: ',len(news_urls))
     print('news_contents: ',len(news_contents))
     print('news_dates: ',len(news_dates))
-    final_news_searches += [name]*len(news_titles)
-    final_news_titles += news_titles
-    final_news_urls += news_urls
-    final_news_contents += news_contents
-    final_news_dates += news_dates
+    final_news_searches += [name[1:-1]]*len(news_titles[:5])
+    final_news_titles += news_titles[:5]
+    final_news_urls += news_urls[:5]
+    final_news_contents += news_contents[:5]
+    final_news_dates += news_dates[:5]
 
 print(len(final_news_searches), len(final_news_titles), len(final_news_contents), len(final_news_urls), len(final_news_dates))
-
 
 ### dataframe save
 news_df = pd.DataFrame({'search': final_news_searches,'date':final_news_dates,'title':final_news_titles,'link':final_news_urls,'content':final_news_contents})
