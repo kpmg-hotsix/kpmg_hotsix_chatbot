@@ -54,9 +54,10 @@ class DataloaderForNER():
 
     def BIO_tagging(self, example):
         label_list = eval(example["label"])
-        label_tag_list = [label["label"][:2] if self.short_label else label["label"] for label in label_list
-                          if label["label"] in self.tag_list
-                          ]
+        if self.short_label:
+            label_tag_list = [label["label"][:2] for label in label_list if label["label"][:2] in self.tag_list]
+        else:
+            label_tag_list = [label["label"] for label in label_list if label["label"] in self.tag_list]
         if len(label_tag_list) < 1:
             return dict(
                 input_ids=[],
@@ -64,9 +65,7 @@ class DataloaderForNER():
                 offset_mapping=[],
                 labels=[]
             )
-        label_offset_list = [(label["begin"], label["end"]) for label in label_list
-                             if label["label"] in self.tag_list
-                             ]
+        label_offset_list = [(label["begin"], label["end"]) for label in label_list if (label["label"] in self.tag_list) or (label["label"][:2] in self.tag_list)]
         encoded = self.tokenizer(
             example["data"], 
             return_token_type_ids=False,
