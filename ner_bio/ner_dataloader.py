@@ -33,31 +33,31 @@ class DataloaderForNER():
             self.short_label = False
         else:
             raise ValueError("Not supported type.")
-        bio_tag_list = []
+        bio_tag_list = ["O"]
         for tag in self.tag_list:
             bio_tag_list.append("B-"+tag)
             bio_tag_list.append("I-"+tag)
-        self.label_to_id = {bio_tag: idx for idx, bio_tag in enumerate(bio_tag_list, 1)}
-        self.label_to_id['O'] = 0
+        self.label_to_id = {bio_tag: idx for idx, bio_tag in enumerate(bio_tag_list)}
         self.random_state=42
 
     def load_data(self):
         dataset = load_dataset("csv", data_files="../data/ner_data.csv", sep="\t", split="train")
+        dataset.cleanup_cache_files()
         dataset = dataset.map(partial(self.BIO_tagging), batched=False)
         dataset = dataset.filter(lambda x: len(x["labels"]) != 0)
-        dataset = dataset.remove_columns(["data", "label"])
         dataset = dataset.train_test_split(test_size=0.2, shuffle=True, seed=self.random_state)
         for split, data in dataset.items():
             data.to_csv(f"../data/data_exps/dataset_{self.label_type}_{split}.csv", sep='\t', index=None)
         dataset = dataset.remove_columns(["data", "label"])
         print(dataset)
-        return dataset["train"], dataset["test"]
+        return dataset
 
     def BIO_tagging(self, example):
         label_list = eval(example["label"])
-        label_tag_list = [label["label"][:2] if self.short_label else label["label"] for label in label_list
-                          if label["label"] in self.tag_list
-                          ]
+        if self.short_label:
+            label_tag_list = [label["label"][:2] for label in label_list if label["label"][:2] in self.tag_list]
+        else:
+            label_tag_list = [label["label"] for label in label_list if label["label"] in self.tag_list]
         if len(label_tag_list) < 1:
             return dict(
                 input_ids=[],
@@ -65,9 +65,7 @@ class DataloaderForNER():
                 offset_mapping=[],
                 labels=[]
             )
-        label_offset_list = [(label["begin"], label["end"]) for label in label_list
-                             if label["label"] in self.tag_list
-                             ]
+        label_offset_list = [(label["begin"], label["end"]) for label in label_list if (label["label"] in self.tag_list) or (label["label"][:2] in self.tag_list)]
         encoded = self.tokenizer(
             example["data"], 
             return_token_type_ids=False,
