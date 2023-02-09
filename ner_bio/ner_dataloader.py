@@ -33,16 +33,16 @@ class DataloaderForNER():
             self.short_label = False
         else:
             raise ValueError("Not supported type.")
-        bio_tag_list = []
+        bio_tag_list = ["O"]
         for tag in self.tag_list:
             bio_tag_list.append("B-"+tag)
             bio_tag_list.append("I-"+tag)
-        self.label_to_id = {bio_tag: idx for idx, bio_tag in enumerate(bio_tag_list, 1)}
-        self.label_to_id['O'] = 0
+        self.label_to_id = {bio_tag: idx for idx, bio_tag in enumerate(bio_tag_list)}
         self.random_state=42
 
     def load_data(self):
         dataset = load_dataset("csv", data_files="../data/ner_data.csv", sep="\t", split="train")
+        dataset.cleanup_cache_files()
         dataset = dataset.map(partial(self.BIO_tagging), batched=False)
         dataset = dataset.filter(lambda x: len(x["labels"]) != 0)
         dataset = dataset.train_test_split(test_size=0.2, shuffle=True, seed=self.random_state)

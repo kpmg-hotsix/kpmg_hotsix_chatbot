@@ -41,7 +41,7 @@ def train(config, training_config):
     metric = Seqeval(list(dataloader.label_to_id.keys()))
 
     wandb.init(project="kpmg_ner", name=f"{config.model_name}_{config.label_type}")
-    output_dir = f"{config.model_name.replace('/', '-')}_{config.label_type}"
+    output_dir = f"exps/{config.model_name.replace('/', '-')}_{config.label_type}"
     training_args = TrainingArguments(
         output_dir,
         **training_config["experiment"]
@@ -63,6 +63,7 @@ def train(config, training_config):
     trainer.evaluate()
     wandb.finish()
 
+os.environ["TOKENIZERS_PARALLELISM"] = "True"
 config, training_config = define_args()
 seed_everything(config.random_seed)
 train(config, training_config)
