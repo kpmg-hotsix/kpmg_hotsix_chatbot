@@ -15,18 +15,10 @@ for i in data['company']:
         t, r = Sentiment_Analysis(t)
         text.append(t)
         result.append(r)
-                
+        company.append(i)        
     
+company_df = pd.DataFrame(company, columns = ['company'])
 text_df = pd.DataFrame(text, columns = ['text'])
 result_df = pd.DataFrame(result, columns = ['result'])
-
-        
-label_idx = 0
-for i in range(0, len(text_df), 5):
-    text_df.loc[i:i+4, 'company'] = data['company'][label_idx]
-    label_idx += 1
-    if label_idx == len(data['company']):
-        label_idx = 0
-
-all_df = pd.concat([text_df, result_df], axis=1)
+all_df = pd.concat([company_df, text_df, result_df], axis=1)
 all_df.to_csv(f'result/korfin_inference_db.csv', sep=',')
