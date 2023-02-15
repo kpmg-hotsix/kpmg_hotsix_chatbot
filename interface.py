@@ -1,6 +1,6 @@
 import re
-# from data.news_search import news_search
-# from Sentiment_Analysis.korfin_inference import Sentiment_Analysis
+from data.news_search import news_search
+from Sentiment_Analysis.korfin_inference import Sentiment_Analysis
 
 from data.company_search import similar_companies
 from data.finance_search import find_finance
@@ -29,14 +29,14 @@ while True:
         print('\n'.join(similar_company[0]))
 
 
-    # if "최근 이슈" in t:
-    #     company = t.split("최근 이슈")[0].replace('의', '')
-    #     print(company) 
-    #     print('task3') 
-    #     news_title = news_search(company)
-    #     print(news_title)
-    #     for t in news_title:
-    #         Sentiment_Analysis(t)
+    if "최근 이슈" in t:
+        company = t.split("최근 이슈")[0].replace('의', '')
+        print(company) 
+        print('task3') 
+        news_title = news_search(company)
+        print(news_title)
+        for t in news_title:
+            Sentiment_Analysis(t)
         
     if "재무제표" in t:
         # company = t.split("재무제표")[0].replace('의', '')
