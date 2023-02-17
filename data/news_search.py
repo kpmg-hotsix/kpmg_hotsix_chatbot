@@ -22,20 +22,11 @@ def makePgNum(num):
 
 # 크롤링 url 생성 (검색어, 시작, 종료)
 # &sort= 0 관련순 1 최신순 2 오래된순
-def makeUrl(search, start_pg, end_pg):
-    if start_pg == end_pg:
-        start_page = makePgNum(start_pg)
-        url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(start_page) + "&sort=1"
-        # print("생성url: ", url)
-        return [url]
-    else:
-        urls = []
-        for i in range(start_pg, end_pg + 1):
-            page = makePgNum(i)
-            url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(page) + "&sort=1"
-            urls.append(url)
-        # print("생성url: ", urls)
-        return urls    
+def makeUrl(search, pg, op=0):
+    start_page = makePgNum(pg)
+    url = "https://search.naver.com/search.naver?where=news&sm=tab_pge&query=" + search + "&start=" + str(start_page) + "&sort=" + str(op)
+    print("생성url: ", url)
+    return url
 
 def news_attrs_crawler(articles,attrs):
     attrs_content=[]
@@ -54,26 +45,19 @@ def articles_crawler(url):
     return url
 
 # naver url 생성
-def getNaverURL(name, pg):
-    news_url =[]
+def getNaverURL(name, pg, op=0):
 
-    url = makeUrl(name,pg,pg)
+    url = makeUrl(name,pg, op)
+    news_url = articles_crawler(url)
 
-    for i in url:
-        url = articles_crawler(i)
-        news_url.append(url)
-
-    news_url_1 = []
-    news_url_1 = sum(news_url, [])
-
-    # NAVER 뉴스만
+    # only Naver news
     final_urls = []
-    for i in range(len(news_url_1)):
-        if "news.naver.com" in news_url_1[i]:
-            final_urls.append(news_url_1[i])
+    for i in tqdm(range(len(news_url))):
+        if "news.naver.com" in news_url[i]:
+            final_urls.append(news_url[i])
         else:
             pass
-    return final_urls[:5]
+    return final_urls
 
 def getNewsTitle(urls, search):
     
@@ -111,6 +95,17 @@ def getNewsTitle(urls, search):
     return news_urls, news_titles, news_dates
 
 
+def recent_check(dates):
+    for date in dates:
+        day = date.split()[0]
+        now = datetime.now()
+        date_to_compare = datetime.strptime(day, "%Y-%m-%d")
+        date_diff = now - date_to_compare
+
+        # 1 년 이상 차이 날 경우 false
+        if date_diff.days > 365:
+            return False
+    return True
 
 
 def news_search(name):
@@ -122,13 +117,15 @@ def news_search(name):
     news_dates = []
 
     for i in range(10):
-        urls = getNaverURL(name, i+1)
+        urls = getNaverURL(name, i+1, 1)
         news_urls2, news_titles2, news_dates2 = getNewsTitle(urls, name)
         news_urls += news_urls2
         news_titles += news_titles2
         news_dates += news_dates2
+        if not recent_check(news_dates2):
+            break
         if len(news_urls) >= 5:
             break
 
-    # return news_titles[:5], news_dates[:5]    
     return news_titles[:5]
+
