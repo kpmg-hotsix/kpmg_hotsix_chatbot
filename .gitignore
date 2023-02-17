@@ -129,8 +129,6 @@ dmypy.json
 .pyre/
 
 # data
-data/*.csv
-data/*.xlsx
 data/before
 data/before2
 wandb
