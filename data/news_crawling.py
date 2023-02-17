@@ -78,7 +78,7 @@ def getNaverURL(name, pg):
     return final_urls
 
 # 뉴스 내용 크롤링
-def getNewsContents(name, urls):
+def getNewsContents(urls, name):
     
     news_titles = []
     news_contents =[]
@@ -138,9 +138,9 @@ final_news_dates = []
 final_news_searches = []
 
 # set names
-raw_data = pd.read_csv('kpmg - DB.csv', encoding='cp949')
+raw_data = pd.read_csv('./data/company_list.csv', encoding='utf-8-sig')
 print(raw_data.head())
-names = raw_data['기업명'].to_list()
+names = raw_data['company'].to_list()
 names = ["\""+i+"\"" for i in names] # for correct search
 # names = ['\"노타\"']
 
@@ -149,9 +149,9 @@ for name in tqdm(names):
     news_titles = []
     news_dates = []
     news_contents = []
-    for i in range(10):
-        urls = getNaverURL(name, i+1)
-        news_urls2, news_titles2, news_contents2, news_dates2 = getNewsContents(urls, name)
+    for cnt in range(10):
+        urls = getNaverURL(name, cnt+1)
+        news_urls2, news_titles2, news_contents2, news_dates2 = getNewsContents(urls, name[1:-1])
         news_urls += news_urls2
         news_titles += news_titles2
         news_contents += news_contents2

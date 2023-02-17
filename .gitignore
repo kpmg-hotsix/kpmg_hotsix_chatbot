@@ -130,3 +130,5 @@ dmypy.json
 
 # data
 data/*.csv
+data/*.xlsx
+data/before
