@@ -129,9 +129,13 @@ dmypy.json
 .pyre/
 
 # data
+<<<<<<< Updated upstream
 data/before
 data/before2
 wandb
 
 # pycharm
 .idea/
+=======
+
+>>>>>>> Stashed changes
