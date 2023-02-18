@@ -4,6 +4,9 @@ from utils import *
 
 # 챗봇 쿼리 처리
 def process_query(t):
+    if "안녕" in t:
+        return "안녕하세요! 기술 키워드를 기반으로 유사한 기업을 찾는 서비스입니다."
+
     if "사용법" in t:
         return '''
             다음 예시 중에서 한 가지 택해서 참고하여 입력해주세요. \n
@@ -14,32 +17,43 @@ def process_query(t):
             매스프레소의 재무제표 알려줘\n
             '''
 
-    if "기술과" in t:
+    elif "기술과" in t:
         company = re.split(' 기술과', t)[0]
         tech_company = tech_search(company)
-        return '\n'.join(tech_company)
+        if tech_company is not None:
+            return '\n'.join(tech_company)
+        else:
+            return "죄송합니다, 찾으시는 결과가 없습니다."
 
-    if "유사한 기업" in t:
+    elif "유사한 기업" in t:
         company = re.split('[과|와]', t)[0] #'과' 말고도 '와'도 경우의 수에 들어가므로..
         typo_company = typo_correction(company)
         similar_company = similar_companies(typo_company)
-        return '\n'.join(similar_company[0])
+        if similar_company is not None:
+            return '\n'.join(similar_company[0])
+        else:
+            return "죄송합니다, 찾으시는 결과가 없습니다."
 
-    if "최근 이슈" in t:
+    elif "최근 이슈" in t:
         company = re.split('의', t)[0]
         typo_company = typo_correction(company)
         news_sentiment = find_sentiment(typo_company)
-        results = []
-        for title, result in zip(news_sentiment['text'], news_sentiment['result']):
-            results.append(f'{title}: {result}')
-        
-        return '\n\n'.join(results)
+        if news_sentiment is not None:
+            results = []
+            for title, result in zip(news_sentiment['text'], news_sentiment['result']):
+                results.append(f'{title}: {result}')
+                
+            return '\n\n'.join(results)
+        else:
+            return "죄송합니다, 찾으시는 결과가 없습니다."
 
                 
-    if "재무제표" in t:
+    elif "재무제표" in t:
         company = re.split('의', t)[0]
         fin = find_finance(company)
-        return f'''
+
+        if fin is not None:    
+            return f'''
         유동비율: {fin['유동비율'].values[0]}\n
         자기자본비율: {fin['자기자본비율'].values[0]}\n
         부채비율: {fin['부채비율'].values[0]}\n
@@ -50,6 +64,11 @@ def process_query(t):
 
         (기준년도: {fin['기준년도'].values[0]})
         '''
+        else:
+            return "죄송합니다, 찾으시는 결과가 없습니다."
+
+    elif "고마워" in t:
+        return "천만의 말씀입니다. 더 도와드릴 것이 있을까요?"
 
     else:
         return "죄송합니다. 무슨 말씀이신지 이해하지 못했습니다."
