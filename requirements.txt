@@ -1,0 +1,6 @@
+gradio
+levenshtein_finder
+datasets
+scikit-learn
+transformers
+deepspeed

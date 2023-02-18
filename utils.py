@@ -1,29 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import ast, os, platform
+import ast
 from levenshtein_finder import levenshtein
 import pandas as pd
 
 
-root_dir = os.path.abspath(os.curdir)
-
-_ = '\\' if platform.system() == 'Windows' else '/'
-if root_dir[len(root_dir) - 1] != _: root_dir += _
-
-BASE = {
-    'root_dir': root_dir.format(_=_),
-    'delimeter': _,  # OS에 따른 폴더 delimeter
-}
-
-
-def api(cls):
-    for key, val in BASE.items():
-        setattr(cls, key, val)
-    return cls
-
-
-def Typo_correction(text):
-    data = pd.read_csv("dataset/finance.csv", sep=',')
+def typo_correction(text):
+    data = pd.read_csv("./data/finance.csv", sep=',')
     data = data['company']
     distance = {word:levenshtein(word, text) for word in data}
     similars = sorted(filter(lambda x:x[1] <= 1, distance.items()), key=lambda x:x[1])
@@ -38,20 +21,20 @@ def Typo_correction(text):
     return matching[0]
 
 def find_finance(name):
-    finance = pd.read_csv('./dataset/finance.csv')
-    idx = finance[finance['company'] == name].index
-    return finance.iloc[idx]
+    finance = pd.read_csv('./data/finance.csv')
+    finance = finance.query(f"company == '{name}'")
+    return finance
 
 def find_sentiment(name):
-    data = pd.read_csv('./dataset/korfin_inference_db.csv')
-    idx = data[data['company'] == name].index
-    return data.iloc[idx][['text','result']]
+    data = pd.read_csv('./data/korfin_inference_db.csv')
+    data = data.query(f"company == '{name}'")
+    return data
 
 def similar_companies(name):
-    similar = pd.read_csv('./dataset/similars.csv')
+    similar = pd.read_csv('./data/similars.csv')
     similar['similars'] = similar['similars'].map(ast.literal_eval)
-    idx = similar[similar['company'] == name].index
-    sims = similar['similars'][idx].values.tolist()
+    similar = similar.query(f"company == '{name}'")
+    sims = similar['similars'].values.tolist()
     return sims
 
 
@@ -60,7 +43,7 @@ def similar_companies(name):
 
 def tech_search(tech):
     keywords = []
-    keywordDB = pd.read_csv("dataset/keyword_DB.csv")
+    keywordDB = pd.read_csv("data/keyword_DB.csv")
 
     for i in reversed(range(len(tech)+1)):
         # print(i)
