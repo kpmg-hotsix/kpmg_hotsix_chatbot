@@ -8,10 +8,10 @@ def process_query(t):
         return '''
             다음 예시 중에서 한 가지 택해서 참고하여 입력해주세요. \n
             
-            "자연어 처리 기술과 관련된 기업 알려줘" \n
-            "매스프레소와(과) 유사한 기업 찾아줘" \n
-            "매스프레소의 최근 이슈 알려줘" \n
-            "매스프레소의 재무제표 알려줘" \n
+            자연어 처리 기술과 관련된 기업 알려줘\n
+            매스프레소와(과) 유사한 기업 찾아줘\n
+            매스프레소의 최근 이슈 알려줘\n
+            매스프레소의 재무제표 알려줘\n
             '''
 
     if "기술과" in t:
@@ -36,12 +36,12 @@ def process_query(t):
         company = re.split('의', t)[0]
         fin = find_finance(company)
         return f'''
-        유동비율: {fin['유동비율'].values[0]} \n
-        자기자본비율: {fin['자기자본비율'].values[0]} \n
-        부채비율: {fin['부채비율'].values[0]} \n
-        총자산회전율: {fin['총자산회전율'].values[0]} \n
-        총자산증가율: {fin['총자산증가율'].values[0]} \n
-        매출액증가율: {fin['매출액증가율'].values[0]} \n
+        유동비율: {fin['유동비율'].values[0]}\n
+        자기자본비율: {fin['자기자본비율'].values[0]}\n
+        부채비율: {fin['부채비율'].values[0]}\n
+        총자산회전율: {fin['총자산회전율'].values[0]}\n
+        총자산증가율: {fin['총자산증가율'].values[0]}\n
+        매출액증가율: {fin['매출액증가율'].values[0]}\n
         순이익증가율: {fin['순이익증가율'].values[0]} \n
 
         (기준년도: {fin['기준년도'].values[0]})
@@ -73,12 +73,12 @@ def process_query(t):
 
 
 def response(text, state):
-    state = state + [(text, process_query(text))]
+    state = state + [(text, process_query(text).replace('\n','<br>'))]
     return state, state
 
 
 with gr.Blocks() as demo:
-    with gr.Row():
+    with gr.Row().style(equal_height=True):
         with gr.Column():
             chatbot = gr.Chatbot()
             state = gr.State([])

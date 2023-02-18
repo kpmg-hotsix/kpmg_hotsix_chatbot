@@ -2,7 +2,7 @@ import pandas as pd
 import ast
 
 def train():
-    df = pd.read_csv('./data/kpmg_news_db.csv')
+    df = pd.read_csv('../../dataset/kpmg_news_db.csv')
     df['precise_intros'] = df['precise_intros'].map(ast.literal_eval)
     df = df[df['precise_intros'].map(lambda d: len(d)) > 0]
 
