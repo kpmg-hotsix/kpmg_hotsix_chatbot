@@ -30,10 +30,3 @@ def train():
 
     similar['name'] = names
     similar['similars'] = sims
-
-def similar_companies(name):
-    similar = pd.read_csv('./data/similars.csv')
-    similar['similars'] = similar['similars'].map(ast.literal_eval)
-    idx = similar[similar['company'] == name].index
-    sims = similar['similars'][idx].values.tolist()
-    return sims
