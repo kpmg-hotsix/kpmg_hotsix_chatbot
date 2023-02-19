@@ -70,6 +70,9 @@ def process_query(t):
     elif "고마워" in t:
         return "천만의 말씀입니다. 더 도와드릴 것이 있을까요?"
 
+    elif "없어" in t:
+        return "네 감사합니다!"
+
     else:
         return "죄송합니다. 무슨 말씀이신지 이해하지 못했습니다."
 
@@ -106,7 +109,7 @@ with gr.Blocks(title='Hotsix', css='''.gradio-container {height: 700px}''') as d
     ''')
     # gr.Markdown('''## 기술 키워드 기반 기업 검색 시스템  ![image](./image/logo.jpeg){: style="float: right"}''')
     # 챗봇 인터페이스
-    with gr.Column(variant='panel'):
+    with gr.Column(variant='panel', min_width=200):
         chatbot = gr.Chatbot(show_label=False)
         state = gr.State([])
         with gr.Row():
@@ -119,4 +122,4 @@ with gr.Blocks(title='Hotsix', css='''.gradio-container {height: 700px}''') as d
         #     with gr.Box():
         #         gr.Markdown("## Select graphs to display")
             
-demo.launch(favicon_path='file/image/logo.ico', inbrowser=True)
+demo.launch(favicon_path='./image/logo.ico', inbrowser=True)

@@ -6,7 +6,9 @@
 질문에 포함된 기술 키워드를 기반으로 관련 기업을 검색하고, 해당 기업들에 대한 정보, 유사한 기업들을 빠르게 조회할 수 있습니다.
 
 ## Overview
-<img width="599" alt="IMG_7674" src="https://user-images.githubusercontent.com/96299403/219872851-e7f55c6f-c64b-4d73-9e77-37c89162585a.PNG">
+<!-- <img width="599" alt="IMG_7674" src="https://user-images.githubusercontent.com/96299403/219872851-e7f55c6f-c64b-4d73-9e77-37c89162585a.PNG">
+ -->
+<img width="599" alt="IMG_7674" src="./image/screenshot.jpg">
 
 ### Functions
 1. 기술 기반 기업 추천
